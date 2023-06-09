@@ -1,27 +1,33 @@
 import { Injectable } from '@angular/core';
 import { FirebaseService } from '../firebase/firebase.service';
-import { Auth, getAuth, onAuthStateChanged, signInWithPopup } from "firebase/auth";
+import { Auth, getAuth, onAuthStateChanged, signInWithPopup, signOut } from "firebase/auth";
 import { GoogleAuthProvider } from "firebase/auth";
 import { Subject } from 'rxjs';
+import { FirestoreService } from '../firestore/firestore.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
+
   auth: Auth;
 
   provider: GoogleAuthProvider;
 
   userSubject: Subject<any> = new Subject
 
-  constructor(private firebase: FirebaseService) {
+  constructor(private firebase: FirebaseService, private firestore: FirestoreService) {
     this.auth = getAuth(this.firebase.app);
     this.provider = new GoogleAuthProvider();
 
-    onAuthStateChanged(this.auth, (user) => {
+    onAuthStateChanged(this.auth, async (user) => {
       if (user) {
 
-        console.log('auth state', user);
+        const dbUser = await firestore.getUser(user.uid);
+
+        if (!dbUser) {
+          await firestore.saveUser(user);
+        }
 
         this.userSubject.next(user);
 
@@ -60,5 +66,11 @@ export class AuthService {
         // ...
       });
   }
+
+  signOut() {
+    signOut(this.auth).then(result => console.log(result));
+  }
+
+
 
 }

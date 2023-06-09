@@ -1,11 +1,9 @@
-<header>
-  <h1>Super Manga</h1>
-  <button (click)="auth.signIn()">Sign In</button>
-</header>
-<main>
+<app-header></app-header>
+<!-- <main>
 <div *ngFor="let manga of mangas">
   <span><strong>Titolo: {{manga.title}}</strong></span>
   <span>Anno: {{manga.year}}</span>
   <span>Completato?: {{manga.isEnded ? "concluso" : "in corso"}}</span>
 </div>
-</main>
+</main> -->
+<router-outlet></router-outlet>
